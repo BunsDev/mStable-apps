@@ -11,6 +11,7 @@ interface Props {
   handleSetMax?(): void
   spender?: string
   token?: SubscribedToken
+  balance?: BigDecimal
 }
 
 const Input = styled(AssetInput)`
@@ -57,7 +58,7 @@ const Container = styled.div`
   border-radius: 0.75rem;
 `
 
-export const AssetInputSingle: FC<Props> = ({ isFetching, formValue, token, handleSetMax, handleSetAmount, spender }) => {
+export const AssetInputSingle: FC<Props> = ({ isFetching, formValue, token, handleSetMax, handleSetAmount, spender, balance }) => {
   return (
     <Container>
       <Input
@@ -71,9 +72,9 @@ export const AssetInputSingle: FC<Props> = ({ isFetching, formValue, token, hand
       />
       <Balance>
         <div>
-          Wallet <span>{token?.symbol}</span>
+          {!!balance ? 'Staked' : 'Wallet'} <span>{token?.symbol}</span>
         </div>
-        <div>{token?.balance?.toFixed(4)}</div>
+        <div>{(balance ?? token?.balance)?.toFixed(4)}</div>
       </Balance>
     </Container>
   )

@@ -92,13 +92,14 @@ export const WithdrawForm: FC = () => {
         formValue={formValue}
         handleSetMax={() => setFormValue(stakedAmount.string)}
         handleSetAmount={setFormValue}
+        balance={stakedAmount}
       />
       <Warnings>
         <Warning>
-          Unstaking is subject to a cooldown period of X days, followed by a Y day withdrawable period. <a>Learn more</a>
+          During withdrawals, your voting power will be temporarily reduced. <a>Learn more</a>
         </Warning>
         <Warning>
-          A redemption fee applies to all withdrawals. The longer you stake, the lower the redemption fee. <a>Learn more</a>
+          There is a cooldown period to unstake & a penalty if you have not staked long enough. <a>Learn more</a>
         </Warning>
         <Fee>
           <div>Redemption Fee</div>

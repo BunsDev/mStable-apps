@@ -18,13 +18,19 @@ interface Balance {
   suffix?: string
 }
 
-const CompoundingToggle = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+const Compound = styled.div`
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: ${({ theme }) => theme.color.bodyAccent};
+  }
 `
 
 const ClaimBalance = styled.div`
@@ -115,13 +121,13 @@ export const ClaimForm: FC = () => {
             <span>MTA</span>
           </div>
         </ClaimBalance>
-        <div>
-          <CompoundingToggle>
+        <Compound>
+          <div>
             <h3>Compound rewards?</h3>
             <ToggleInput onClick={toggleIsCompounding} checked={isCompounding} />
-          </CompoundingToggle>
+          </div>
           <p>This will claim and re-stake your earned MTA in 1 transaction</p>
-        </div>
+        </Compound>
       </div>
       <SendButton valid={!!rewards?.amount} title={isCompounding ? 'Compound Rewards' : 'Claim Rewards'} handleSend={handleSend} />
     </Container>

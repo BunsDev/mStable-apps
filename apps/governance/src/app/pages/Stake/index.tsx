@@ -5,6 +5,7 @@ import { GovernancePageHeader } from '../../components/GovernancePageHeader'
 
 import { StakeForms } from './StakeForms'
 import { StakeBalances } from './StakeBalances'
+import { PendingBalances } from './PendingBalances'
 
 const Container = styled.div`
   display: flex;
@@ -22,6 +23,7 @@ export const Stake: FC = () => {
         </p>
       </GovernancePageHeader>
       <StakeBalances />
+      <PendingBalances />
       <StakeForms />
     </Container>
   )

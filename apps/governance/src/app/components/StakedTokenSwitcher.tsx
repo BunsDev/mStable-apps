@@ -13,11 +13,6 @@ const StyledDropdown = styled(Dropdown)`
     background: ${({ theme }) => theme.color.background[2]};
   }
 
-  img {
-    box-shadow: 0 0 8px ${({ theme }) => theme.color.background[3]};
-    border-radius: 1rem;
-  }
-
   * {
     margin-right: 0 !important;
   }

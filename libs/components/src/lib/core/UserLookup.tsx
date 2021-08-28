@@ -1,47 +1,42 @@
-import React, { ChangeEventHandler, useCallback, useRef } from 'react'
+import React, { useRef } from 'react'
 import type { FC } from 'react'
 import styled from 'styled-components'
-import { isAddress } from 'ethers/lib/utils'
 
-import { Input } from '@apps/components/forms'
+import { AddressInput } from '@apps/components/forms'
 import { Button } from '@apps/components/core'
 import { useIsMasquerading, useMasquerade } from '@apps/base/context/account'
-import { ViewportWidth } from '@apps/base/theme'
+import { truncateAddress } from '@apps/formatters'
+
+const StyledAddressInput = styled(AddressInput)`
+  input {
+    font-size: 1.25rem;
+    padding-left: 0;
+  }
+`
+
+const Masquerade = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 3rem;
+
+  > span:first-child {
+    ${({ theme }) => theme.mixins.numeric};
+    font-size: 1.25rem;
+  }
+`
 
 const Container = styled.div`
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem 0.25rem 1rem;
   border: 1px solid ${({ theme }) => theme.color.defaultBorder};
   border-radius: 1rem;
+  width: 100%;
 
-  > h3 {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  > :not(:last-child) {
-    margin-bottom: 0.5rem;
-  }
-
-  > :last-child {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  input {
-    padding-left: 0;
-    height: inherit;
-    padding: 0.75rem 0;
-    width: 100%;
-    margin-right: 1.875rem;
-  }
-
-  @media (min-width: ${ViewportWidth.m}) {
-    > h3 {
-      font-size: 1.25rem;
-    }
+  > h4 {
+    font-size: 0.875rem;
+    color: ${({ theme }) => theme.color.bodyAccent};
   }
 `
 
@@ -50,27 +45,26 @@ export const UserLookup: FC = () => {
   const masquerade = useMasquerade()
   const isMasquerading = useIsMasquerading()
 
-  const handleChange = useCallback<ChangeEventHandler<HTMLInputElement>>(event => {
-    inputText.current = event.target.value ?? undefined
-  }, [])
+  const handleClick = (address?: string) => {
+    inputText.current = address
+    if (!isMasquerading) {
+      masquerade(address)
+    } else {
+      masquerade(undefined)
+    }
+  }
 
   return (
     <Container>
-      <h3>{isMasquerading ? 'Viewing balance of' : 'Lookup user balance'}</h3>
-      <div>
-        <Input placeholder="0x000…" onChange={handleChange} />
-        <Button
-          onClick={() => {
-            if (!isMasquerading && inputText.current && isAddress(inputText.current)) {
-              masquerade(inputText.current)
-            } else {
-              masquerade()
-            }
-          }}
-        >
-          {isMasquerading ? 'Reset' : 'View'}
-        </Button>
-      </div>
+      <h4>{isMasquerading ? 'Viewing balance of' : 'Lookup user balance'}</h4>
+      {isMasquerading ? (
+        <Masquerade>
+          <span>{truncateAddress(inputText.current ?? '')}</span>
+          <Button onClick={() => masquerade()}>Reset</Button>
+        </Masquerade>
+      ) : (
+        <StyledAddressInput title="View" onClick={handleClick} />
+      )}
     </Container>
   )
 }

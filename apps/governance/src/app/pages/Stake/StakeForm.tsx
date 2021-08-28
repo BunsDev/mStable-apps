@@ -10,9 +10,8 @@ import { usePropose } from '@apps/base/context/transactions'
 import { useBigDecimalInput } from '@apps/hooks'
 import { TransactionManifest, Interfaces } from '@apps/transaction-manifest'
 import { AssetInputSingle, SendButton, ToggleInput } from '@apps/components/forms'
-import { DelegateInput } from '../../components/DelegateInput'
-
 import { useStakedToken, useStakedTokenQuery } from '../../context/StakedTokenProvider'
+import { DelegateInput } from '../../components/DelegateInput'
 
 const Input = styled(AssetInputSingle)`
   background: ${({ theme }) => theme.color.background[0]};

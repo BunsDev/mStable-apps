@@ -65,7 +65,7 @@ export const WithdrawForm: FC = () => {
   // need to figure out how to get weighted timestamp
   useEffect(() => {
     const weightedTimestamp = data?.stakedToken?.accounts?.[0]?.balance.weightedTimestamp
-    if (!weightedTimestamp) return setFee.error('weighted timestamp null')
+    if (!weightedTimestamp) return
     Promise.all([account ? StakedToken__factory.connect(stakedTokenAddress, signer).calcRedemptionFeeRate(weightedTimestamp) : undefined])
       .then(([fee = 0]) => {
         setFee.value(new BigDecimal(fee))

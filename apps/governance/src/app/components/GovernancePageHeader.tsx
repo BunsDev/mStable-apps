@@ -80,7 +80,7 @@ const Container = styled.div<{
   gap: 1rem;
 
   h2 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 600;
   }
 

@@ -8,23 +8,23 @@ import { usePropose } from '@apps/base/context/transactions'
 import { TransactionManifest, Interfaces } from '@apps/transaction-manifest'
 import { SendButton, ToggleInput } from '@apps/components/forms'
 import { useStakedToken, useStakedTokenQuery } from '../../context/StakedTokenProvider'
-import { TokenIcon } from '@apps/components/icons'
-import { ThemedSkeleton } from '@apps/components/core'
+import { MultiRewards } from '@apps/components/core'
+import { BigDecimal } from '@apps/bigdecimal'
 
 interface Balance {
   symbol?: string
-  amount: number
-  decimals?: number
-  suffix?: string
+  amount: BigDecimal
 }
 
 const Compound = styled.div`
+  padding: 0 0.5rem;
+
   > div {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
   }
 
   p {
@@ -33,54 +33,33 @@ const Compound = styled.div`
   }
 `
 
-const ClaimBalance = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.125rem;
-
-  > *:first-child span {
-    ${({ theme }) => theme.mixins.numeric};
-  }
-
-  > *:last-child {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-
-    div {
-      width: 2rem;
-      margin-right: 0.5rem;
-    }
+const StyledMultiRewards = styled(MultiRewards)`
+  tbody {
+    background: ${({ theme }) => theme.color.background[0]};
   }
 `
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 2rem;
-
-  > *:first-child {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    padding: 0 0.5rem;
-    flex: 1;
-  }
+  height: 100%;
 `
 
 export const ClaimForm: FC = () => {
-  const { data, loading } = useStakedTokenQuery()
-  const { selected: stakedTokenAddress } = useStakedToken()
+  const { data } = useStakedTokenQuery()
+  const { selected: stakedTokenAddress, options } = useStakedToken()
   const [isCompounding, toggleIsCompounding] = useToggle(false)
 
   const propose = usePropose()
   const signer = useSigner()
 
+  const stakedTokenSymbol = options[stakedTokenAddress]?.icon?.symbol
+
   const rewards = useMemo<Balance>((): Balance | undefined => {
     const account = data?.stakedToken?.accounts?.[0]
-    if (!data || !account) return
-    return { symbol: data.stakedToken.stakingRewards.rewardsToken.symbol, amount: parseInt(account.rewards) / 1e18 }
+    return { symbol: stakedTokenSymbol, amount: new BigDecimal(account?.rewards ?? 0) }
   }, [data])
 
   const handleSend = () => {
@@ -105,22 +84,8 @@ export const ClaimForm: FC = () => {
 
   return (
     <Container>
-      <div>
-        <ClaimBalance>
-          <div>
-            {loading ? (
-              <ThemedSkeleton height={28} width={230} />
-            ) : !!rewards?.amount ? (
-              <span>{rewards?.amount}</span>
-            ) : (
-              <span>no rewards</span>
-            )}
-          </div>
-          <div>
-            <TokenIcon symbol="MTA" />
-            <span>MTA</span>
-          </div>
-        </ClaimBalance>
+      <StyledMultiRewards rewardsEarned={{ rewards: [{ earned: rewards?.amount, token: rewards?.symbol }] }} />
+      {stakedTokenSymbol === 'MTA' && (
         <Compound>
           <div>
             <h3>Compound rewards?</h3>
@@ -128,7 +93,7 @@ export const ClaimForm: FC = () => {
           </div>
           <p>This will claim and re-stake your earned MTA in 1 transaction</p>
         </Compound>
-      </div>
+      )}
       <SendButton valid={!!rewards?.amount} title={isCompounding ? 'Compound Rewards' : 'Claim Rewards'} handleSend={handleSend} />
     </Container>
   )

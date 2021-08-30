@@ -69,7 +69,7 @@ export const ClaimForm: FC = () => {
       return propose<Interfaces.StakedToken, 'compoundRewards'>(
         new TransactionManifest(StakedToken__factory.connect(stakedTokenAddress, signer), 'compoundRewards', [], {
           present: `Compound rewards`,
-          past: `Compounding rewards`,
+          past: `Compounded rewards`,
         }),
       )
     }

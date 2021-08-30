@@ -138,7 +138,7 @@ const Container = styled.table<{ minWidth?: number }>`
 export const TableCell: FC<{ className?: string; width?: number }> = ({ children, className, width }) => {
   return (
     <Cell role="cell" className={className} width={width}>
-      <div>{children}</div>
+      {children}
     </Cell>
   )
 }

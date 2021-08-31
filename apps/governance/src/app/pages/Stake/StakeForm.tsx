@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react'
 import { useToggle } from 'react-use'
 import styled from 'styled-components'
 
-import { StakedToken__factory } from '@apps/artifacts/typechain'
+import { IncentivisedVotingLockup__factory, StakedToken__factory } from '@apps/artifacts/typechain'
 import { useSigner } from '@apps/base/context/account'
 import { Warning } from '@apps/components/core'
 import { useTokenSubscription } from '@apps/base/context/tokens'
@@ -12,10 +12,21 @@ import { TransactionManifest, Interfaces } from '@apps/transaction-manifest'
 import { AssetInputSingle, SendButton, ToggleInput } from '@apps/components/forms'
 import { useStakedToken, useStakedTokenQuery } from '../../context/StakedTokenProvider'
 import { DelegateInput } from '../../components/DelegateInput'
+import { useNetworkAddresses } from '@apps/base/context/network'
+import { useStakingMigration } from '../../hooks/useStakingMigration'
+
+interface Props {
+  className?: string
+  isMigrating?: boolean
+}
 
 const Input = styled(AssetInputSingle)`
   background: ${({ theme }) => theme.color.background[0]};
   height: 3.5rem;
+`
+
+const StyledDelegateInput = styled(DelegateInput)<{ isMigrating?: boolean }>`
+  background: ${({ theme, isMigrating }) => isMigrating && theme.color.background[3]};
 `
 
 const DelegateToggle = styled.div`
@@ -35,11 +46,14 @@ const Container = styled.div`
   gap: 1rem;
 `
 
-export const StakeForm: FC = () => {
+export const StakeForm: FC<Props> = ({ className, isMigrating = true }) => {
   const { data, loading } = useStakedTokenQuery()
   const { selected: stakedTokenAddress } = useStakedToken()
+  const networkAddresses = useNetworkAddresses()
+  const [withdrawnBalance, toggleWithdrawnBalance] = useStakingMigration()
 
   const stakingToken = useTokenSubscription(data?.stakedToken?.stakingToken.address)
+  const balanceV1 = useTokenSubscription(networkAddresses.vMTA)?.balance
 
   const propose = usePropose()
   const signer = useSigner()
@@ -48,7 +62,22 @@ export const StakeForm: FC = () => {
   const [isDelegating, toggleIsDelegating] = useToggle(true)
   const [delegate, setDelegate] = useState<string | undefined>()
 
-  const handleSend = () => {
+  const handleWithdrawV1 = () => {
+    if (!signer || !data || !balanceV1?.simple) return
+
+    propose<Interfaces.IncentivisedVotingLockup, 'withdraw'>(
+      new TransactionManifest(IncentivisedVotingLockup__factory.connect(networkAddresses.vMTA, signer), 'withdraw', [], {
+        present: `Withdrawing from Staking V1`,
+        past: `Withdrew from Staking V1`,
+      }),
+    )
+
+    if (!withdrawnBalance) {
+      toggleWithdrawnBalance()
+    }
+  }
+
+  const handleDeposit = () => {
     if (!signer || !data || amount.exact.lte(0)) return
 
     if (delegate) {
@@ -74,7 +103,7 @@ export const StakeForm: FC = () => {
   }
 
   return (
-    <Container>
+    <Container className={className}>
       <Input
         isFetching={loading}
         token={stakingToken}
@@ -87,14 +116,21 @@ export const StakeForm: FC = () => {
         <h3>Delegate stake?</h3>
         <ToggleInput onClick={toggleIsDelegating} checked={isDelegating} />
       </DelegateToggle>
-      {isDelegating && <DelegateInput delegate={delegate} onClick={setDelegate} />}
+      {isDelegating && <StyledDelegateInput isMigrating={isMigrating} delegate={delegate} onClick={setDelegate} />}
       <Warning>
         Unstaking is subject to a cooldown period of X days, followed by a Y day withdrawable period. <a>Learn more</a>
       </Warning>
       <Warning>
         A redemption fee applies to all withdrawals. The longer you stake, the lower the redemption fee. <a>Learn more</a>
       </Warning>
-      <SendButton valid={(isDelegating && !!delegate) || !isDelegating} title="Stake" handleSend={handleSend} />
+      {isMigrating ? (
+        <div>
+          <SendButton valid={!!balanceV1?.simple} title="Withdraw from V1" handleSend={handleWithdrawV1} />
+          <SendButton valid={(isDelegating && !!delegate) || !isDelegating} title="Stake in V2" handleSend={handleDeposit} />
+        </div>
+      ) : (
+        <SendButton valid={(isDelegating && !!delegate) || !isDelegating} title="Stake" handleSend={handleDeposit} />
+      )}
     </Container>
   )
 }

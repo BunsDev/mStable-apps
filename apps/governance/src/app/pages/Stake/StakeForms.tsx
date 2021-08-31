@@ -8,8 +8,12 @@ import { ClaimForm } from './ClaimForm'
 import { ClaimGraph } from './ClaimGraph'
 import { StakeForm } from './StakeForm'
 import { StakeGraph } from './StakeGraph'
+import { StakeMigration } from './StakeMigration'
 import { WithdrawForm } from './WithdrawForm'
 import { WithdrawGraph } from './WithdrawGraph'
+import { useNetworkAddresses } from '@apps/base/context/network'
+import { useTokenSubscription } from '@apps/base/context/tokens'
+import { StakingMigrationProvider, useStakingMigration } from '../../hooks/useStakingMigration'
 
 enum Tabs {
   Stake,
@@ -105,8 +109,15 @@ const FormsContainer = styled.div`
 
 const Content: FC = () => {
   const [{ tabs, activeTabIndex }, setActiveIndex] = useTabs()
+  const networkAddresses = useNetworkAddresses()
+  const balanceV1Simple = useTokenSubscription(networkAddresses.vMTA)?.balance?.simple
+  const [withdrawnBalance] = useStakingMigration()
+
   const { Graph, Form } = stakeTabs[activeTabIndex]
-  return (
+
+  return !!balanceV1Simple || withdrawnBalance ? (
+    <StakeMigration />
+  ) : (
     <FormsContainer>
       <Graph />
       <div>
@@ -126,7 +137,9 @@ const Content: FC = () => {
 }
 
 export const StakeForms: FC = () => (
-  <TabsProvider>
-    <Content />
-  </TabsProvider>
+  <StakingMigrationProvider>
+    <TabsProvider>
+      <Content />
+    </TabsProvider>
+  </StakingMigrationProvider>
 )

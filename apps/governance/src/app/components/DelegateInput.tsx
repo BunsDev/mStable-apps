@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { AddressInput } from '@apps/components/forms'
 
 interface Props {
+  className?: string
   delegate?: string
   onClick: (address?: string) => void
 }
@@ -33,9 +34,9 @@ const Container = styled.div`
   align-items: center;
 `
 
-export const DelegateInput: FC<Props> = ({ delegate, onClick }) => {
+export const DelegateInput: FC<Props> = ({ delegate, onClick, className }) => {
   return (
-    <Container>
+    <Container className={className}>
       {delegate ? (
         <Delegation>
           <div>

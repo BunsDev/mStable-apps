@@ -14,6 +14,7 @@ import type {
   StakingRewardsWithPlatformToken,
   FraxCrossChainFarm,
   StakedToken,
+  IncentivisedVotingLockup,
 } from '@apps/artifacts/typechain'
 
 export interface Purpose {
@@ -35,6 +36,7 @@ export enum Interfaces {
   FraxCrossChainFarm,
   StakingRewardsWithPlatformToken,
   StakedToken,
+  IncentivisedVotingLockup,
 }
 
 export interface Instances {
@@ -50,6 +52,7 @@ export interface Instances {
   [Interfaces.FraxCrossChainFarm]: FraxCrossChainFarm
   [Interfaces.StakingRewardsWithPlatformToken]: StakingRewardsWithPlatformToken
   [Interfaces.StakedToken]: StakedToken
+  [Interfaces.IncentivisedVotingLockup]: IncentivisedVotingLockup
 }
 
 const calculateGasMargin = (value: BigNumber, margin = 1000): BigNumber => {

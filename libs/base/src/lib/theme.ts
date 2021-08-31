@@ -160,6 +160,9 @@ export const mixins = {
   numeric: css`
     font-family: 'DM Mono', monospace !important;
   `,
+  pixel: css`
+    font-family: 'Press Start 2P';
+  `,
   card: css`
     display: flex;
     position: relative;

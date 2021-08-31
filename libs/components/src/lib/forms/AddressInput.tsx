@@ -46,8 +46,8 @@ const StyledInput = styled(Input)`
 
 const Container = styled.div`
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
 `
 
 export const AddressInput: FC<Props> = ({ onClick, title, className }) => {

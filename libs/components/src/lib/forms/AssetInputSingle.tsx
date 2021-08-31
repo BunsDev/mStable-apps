@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 import styled from 'styled-components'
 import { AssetInput } from './AssetInput'
 import { SubscribedToken } from '@apps/types'
+import { BigDecimal } from '@apps/bigdecimal'
 
 interface Props {
   className?: string

@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 import styled from 'styled-components'
 
 import { StakeForm } from './StakeForm'
-import { ReactComponent as MigrationArrow } from '@apps/components/icons/migration-arrow.svg'
+import { ReactComponent as MigrationArrow } from '../../../assets/migration-arrow.svg'
 import { ViewportWidth } from '@apps/base/theme'
 
 const StyledStakeForm = styled(StakeForm)`

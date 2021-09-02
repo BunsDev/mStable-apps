@@ -55,20 +55,6 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
 
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 500;
-    line-height: 2rem;
-    color: ${({ theme }) => theme.color.body};
-  }
-
-  h4 {
-    font-size: 0.75rem;
-    line-height: 1.5rem;
-    font-weight: 400;
-    color: ${({ theme }) => theme.color.bodyTransparent};
-  }
-
   > div {
     margin-top: 1rem;
   }
@@ -88,8 +74,6 @@ export const StakeGraph: FC = () => {
 
   return (
     <Container>
-      <h2>Voting Power</h2>
-      <h4>Your vMTA balance will increase the longer you stake</h4>
       <ResponsiveContainer width="100%" aspect={1.75}>
         <AreaChart data={data}>
           <defs>

@@ -1,26 +1,39 @@
 import React, { FC } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { Button } from '@apps/components/core'
 import { ViewportWidth } from '@apps/base/theme'
 import { ReactComponent as MTAIcon } from '@apps/components/icons/tokens/MTA.svg'
 import { ReactComponent as BPTIcon } from '@apps/components/icons/tokens/BPT-MTA-ETH.svg'
 import { ReactComponent as CheckmarkIcon } from '@apps/components/icons/checkmark.svg'
+import { useSetStakedToken, useStakedToken } from '../../context/StakedTokenProvider'
+
+enum Selection {
+  MTA,
+  BPT,
+}
+
+const IconContainer = css`
+  display: flex;
+  justify-content: flex-end;
+`
 
 const MTAContainer = styled.div`
-  width: 6rem;
+  ${IconContainer};
+  width: 12rem;
 
   svg {
-    width: 100%;
+    width: 4rem;
     height: 100%;
   }
 `
 
 const BPTContainer = styled.div`
-  width: 7.25rem;
+  ${IconContainer};
+  width: 14rem;
 
   svg {
-    width: 100%;
+    width: 4.25rem;
     height: 100%;
   }
 `
@@ -53,6 +66,8 @@ const Checklist = styled.div`
 const Header = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
+  height: 100%;
 
   > div:first-child {
     display: flex;
@@ -69,18 +84,52 @@ const Header = styled.div`
       font-size: 0.875rem;
     }
   }
+
+  @media (min-width: ${ViewportWidth.m}) {
+    max-height: 6rem;
+  }
 `
 
 const SelectionBox = styled.div`
   display: flex;
+  position: relative;
   flex: 1;
   flex-direction: column;
   background: ${({ theme }) => theme.color.background[0]};
   border: 1px solid ${({ theme }) => theme.color.defaultBorder};
   border-radius: 1rem;
-  padding: 2.25rem 1rem;
+  padding: 2.25rem 1rem 1rem 1rem;
   justify-content: space-between;
   gap: 2rem;
+`
+
+const MTASelectionBox = styled(SelectionBox)`
+  border: 1px solid ${({ theme }) => theme.color.primaryTransparent};
+`
+
+const RecommendedBox = styled.div`
+  --height: 1.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  top: calc(var(--height) / -2);
+  right: 0;
+  height: var(--height);
+
+  > div {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    border-radius: 2rem;
+    background: ${({ theme }) => theme.color.primary};
+    color: ${({ theme }) => theme.color.white};
+    padding: 0 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
 `
 
 const Container = styled.div`
@@ -88,22 +137,48 @@ const Container = styled.div`
   flex-direction: column;
   border-radius: 1.125rem;
   background: ${({ theme }) => theme.color.background[1]};
-  border: 1px solid ${({ theme }) => theme.color.defaultBorder};
-  padding: 1rem;
   gap: 1rem;
 
   @media (min-width: ${ViewportWidth.m}) {
+    padding: 1rem;
+    border: 1px solid ${({ theme }) => theme.color.defaultBorder};
+    align-items: center;
+
+    > div {
+      max-width: 40rem;
+    }
   }
 
   @media (min-width: ${ViewportWidth.l}) {
     flex-direction: row;
+    align-items: unset;
+
+    > div {
+      max-width: 100%;
+      flex: 1;
+    }
   }
 `
 
 export const StakeSelection: FC = () => {
+  const { options } = useStakedToken()
+  const setStakedToken = useSetStakedToken()
+
+  const handleSelection = (selection: Selection) => {
+    const tokens = Object.keys(options).map(key => key)
+    if (selection === Selection.MTA) {
+      return setStakedToken(tokens[0])
+    }
+
+    setStakedToken(tokens[1])
+  }
+
   return (
     <Container>
-      <SelectionBox>
+      <MTASelectionBox>
+        <RecommendedBox>
+          <div>Recommended</div>
+        </RecommendedBox>
         <Header>
           <div>
             <h2>Stake MTA</h2>
@@ -119,10 +194,10 @@ export const StakeSelection: FC = () => {
           </div>
           MTA Rewards
         </Checklist>
-        <Button highlighted scale={1.125} onClick={() => {}}>
+        <Button highlighted scale={1.125} onClick={() => handleSelection(Selection.MTA)}>
           Stake MTA
         </Button>
-      </SelectionBox>
+      </MTASelectionBox>
       <SelectionBox>
         <Header>
           <div>
@@ -139,7 +214,7 @@ export const StakeSelection: FC = () => {
           </div>
           MTA Rewards, BAL Rewards, Trading Fees
         </Checklist>
-        <Button highlighted scale={1.125} onClick={() => {}}>
+        <Button highlighted scale={1.125} onClick={() => handleSelection(Selection.BPT)}>
           Stake BPT
         </Button>
       </SelectionBox>

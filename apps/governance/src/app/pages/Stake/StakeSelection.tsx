@@ -7,6 +7,8 @@ import { ReactComponent as MTAIcon } from '@apps/components/icons/tokens/MTA.svg
 import { ReactComponent as BPTIcon } from '@apps/components/icons/tokens/BPT-MTA-ETH.svg'
 import { ReactComponent as CheckmarkIcon } from '@apps/components/icons/checkmark.svg'
 import { useSetStakedToken, useStakedToken } from '../../context/StakedTokenProvider'
+import { useStakingStatus, useStakingStatusDispatch } from '../../context/StakingStatusProvider'
+import { useNetworkAddresses } from '@apps/base/context/network'
 
 enum Selection {
   MTA,
@@ -163,14 +165,19 @@ const Container = styled.div`
 export const StakeSelection: FC = () => {
   const { options } = useStakedToken()
   const setStakedToken = useSetStakedToken()
+  const { setSelectedOption } = useStakingStatusDispatch()
+  const mtaAddress = useNetworkAddresses()?.MTA
 
   const handleSelection = (selection: Selection) => {
-    const tokens = Object.keys(options).map(key => key)
+    const tokens = Object.keys(options)
+      .map(key => key)
+      .sort(a => (a == mtaAddress ? 1 : -1))
     if (selection === Selection.MTA) {
-      return setStakedToken(tokens[0])
+      setStakedToken(tokens[0])
+      return setSelectedOption()
     }
-
     setStakedToken(tokens[1])
+    setSelectedOption()
   }
 
   return (
@@ -182,7 +189,9 @@ export const StakeSelection: FC = () => {
         <Header>
           <div>
             <h2>Stake MTA</h2>
-            <h4>In return for participating in governance, you will receive MTA rewards. Learn about the risks</h4>
+            <h4>
+              In return for participating in governance, you will receive MTA rewards. <a href="#">Learn about the risks</a>
+            </h4>
           </div>
           <MTAContainer>
             <MTAIcon />
@@ -202,7 +211,10 @@ export const StakeSelection: FC = () => {
         <Header>
           <div>
             <h2>Stake MTA/ETH BPT</h2>
-            <h4>In return for participating in governance, you will receive MTA, BAL rewards and trading fees. Learn about the risks</h4>
+            <h4>
+              In return for participating in governance, you will receive MTA, BAL rewards and trading fees.{' '}
+              <a href="#">Learn about the risks</a>
+            </h4>
           </div>
           <BPTContainer>
             <BPTIcon />

@@ -13,7 +13,7 @@ import { AssetInputSingle, SendButton, ToggleInput } from '@apps/components/form
 import { useStakedToken, useStakedTokenQuery } from '../../context/StakedTokenProvider'
 import { DelegateInput } from '../../components/DelegateInput'
 import { useNetworkAddresses } from '@apps/base/context/network'
-import { useStakingMigration } from '../../hooks/useStakingMigration'
+import { useStakingStatus, useStakingStatusDispatch } from '../../context/StakingStatusProvider'
 
 interface Props {
   className?: string
@@ -46,11 +46,12 @@ const Container = styled.div`
   gap: 1rem;
 `
 
-export const StakeForm: FC<Props> = ({ className, isMigrating = true }) => {
+export const StakeForm: FC<Props> = ({ className, isMigrating = false }) => {
   const { data, loading } = useStakedTokenQuery()
   const { selected: stakedTokenAddress } = useStakedToken()
   const networkAddresses = useNetworkAddresses()
-  const [withdrawnBalance, toggleWithdrawnBalance] = useStakingMigration()
+  const { hasWithdrawnV1Balance } = useStakingStatus()
+  const { setWithdrewV1Balance } = useStakingStatusDispatch()
 
   const stakingToken = useTokenSubscription(data?.stakedToken?.stakingToken.address)
   const balanceV1 = useTokenSubscription(networkAddresses.vMTA)?.balance
@@ -72,8 +73,8 @@ export const StakeForm: FC<Props> = ({ className, isMigrating = true }) => {
       }),
     )
 
-    if (!withdrawnBalance) {
-      toggleWithdrawnBalance()
+    if (!hasWithdrawnV1Balance) {
+      setWithdrewV1Balance()
     }
   }
 

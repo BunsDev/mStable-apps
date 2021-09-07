@@ -4,7 +4,7 @@ import { CountdownBar, Table, TableCell, TableRow, Tooltip } from '@apps/compone
 import { useStakedToken, useStakedTokenQuery } from '../../context/StakedTokenProvider'
 import { TransactionManifest, Interfaces } from '@apps/transaction-manifest'
 import { usePropose } from '@apps/base/context/transactions'
-import { useAccount, useSigner } from '@apps/base/context/account'
+import { useOwnAccount, useSigner } from '@apps/base/context/account'
 import { StakedToken__factory } from '@apps/artifacts/typechain'
 import { BigDecimal } from '@apps/bigdecimal'
 
@@ -77,7 +77,7 @@ export const PendingBalances: FC = () => {
 
   const propose = usePropose()
   const signer = useSigner()
-  const address = useAccount()
+  const address = useOwnAccount()
 
   const { percentage, endTime, balance, unlocked, symbol } = useMemo<Props>((): Props => {
     const stakedToken = data?.stakedToken
@@ -114,7 +114,7 @@ export const PendingBalances: FC = () => {
     if (!signer || !data) return
 
     return propose<Interfaces.StakedToken, 'withdraw'>(
-      new TransactionManifest(StakedToken__factory.connect(stakedTokenAddress, signer), 'withdraw', [balance.exact, address, false, true], {
+      new TransactionManifest(StakedToken__factory.connect(stakedTokenAddress, signer), 'withdraw', [balance.exact, address, true, true], {
         present: `Withdraw ${balance?.simple} ${symbol}`,
         past: `Withdrew ${balance?.simple} ${symbol}`,
       }),
@@ -122,7 +122,7 @@ export const PendingBalances: FC = () => {
   }
 
   return (
-    !!balance && (
+    !!balance?.simple && (
       <StyledTable widths={TABLE_WIDTHS} width={28}>
         <TableRow buttonTitle="Withdraw" onClick={(unlocked && handleWithdrawal) || undefined}>
           <TableCell width={TABLE_WIDTHS[0]}>

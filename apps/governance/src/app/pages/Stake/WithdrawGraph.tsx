@@ -57,7 +57,7 @@ const Container = styled.div`
 export const WithdrawGraph: FC = () => {
   const { data: stakedData } = useStakedTokenQuery()
 
-  const weightedTimestamp = stakedData?.stakedToken?.accounts?.[0].balance?.weightedTimestamp ?? Date.now() / 1e3
+  const weightedTimestamp = (stakedData?.stakedToken?.accounts?.[0]?.balance?.weightedTimestamp ?? Date.now()) / 1e3
   const weeksStaked = (Date.now() / 1e3 - weightedTimestamp) / WEEK
 
   const data = generateData(weeksStaked)

@@ -1,5 +1,4 @@
 import React, { FC } from 'react'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import styled, { keyframes } from 'styled-components'
 
 import { TabsOfTruth, createTabsContext } from '@apps/components/core'
@@ -14,7 +13,8 @@ import { WithdrawForm } from './WithdrawForm'
 import { WithdrawGraph } from './WithdrawGraph'
 import { useNetworkAddresses } from '@apps/base/context/network'
 import { useTokenSubscription } from '@apps/base/context/tokens'
-import { StakingMigrationProvider, useStakingMigration } from '../../hooks/useStakingMigration'
+import { StakingStatusProvider, useStakingStatus } from '../../context/StakingStatusProvider'
+import { ViewportWidth } from '@apps/base/theme'
 
 enum Tabs {
   Stake,
@@ -51,59 +51,8 @@ const stakeTabs: { id: Tabs; title: string; heading: string; subheading: string;
 
 const [useTabs, TabsProvider] = createTabsContext(stakeTabs)
 
-const slide = keyframes`
-  0% {
-    filter: blur(0);
-    opacity: 1;
-  }
-  100% {
-    filter: blur(2px);
-    opacity: 0;
-  }
-`
-
-// Temp scroll, maybe move delegation position
-const StyledTransitionGroup = styled(TransitionGroup)`
-  overflow-y: scroll;
-  height: 100%;
-  min-height: 22rem;
-  position: relative;
-
-  h3 {
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  > * {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-`
-
-const FormTransition = styled.div`
-  &.entering {
-    > * {
-      animation: ${slide} 0.25s ease-in reverse;
-    }
-  }
-  &.exiting {
-    > * {
-      animation: ${slide} 0.25s ease-out;
-    }
-  }
-  &.exited {
-    > * {
-      opacity: 0;
-      filter: blur(2px);
-    }
-  }
-`
-
 const GraphContainer = styled.div`
-  width: 100%;
+  flex: 1;
 
   h2 {
     font-size: 1.25rem;
@@ -122,21 +71,22 @@ const GraphContainer = styled.div`
 
 const FormContainer = styled.div`
   min-height: 20rem;
-  min-width: 24rem;
-  max-width: 28rem;
   padding: 0.75rem;
   background: ${({ theme }) => theme.color.background[1]};
   border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   gap: 0.75rem;
+
+  @media (min-width: ${ViewportWidth.m}) {
+    min-width: 24rem;
+    width: 24rem;
+  }
 `
 
 const FormsContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 1rem;
   background: ${({ theme }) => theme.color.background[0]};
   border: 1px ${({ theme }) => theme.color.background[1]} solid;
@@ -145,20 +95,26 @@ const FormsContainer = styled.div`
   > :first-child {
     padding: 1.5rem;
   }
+
+  @media (min-width: ${ViewportWidth.m}) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 `
 
 const Content: FC = () => {
   const [{ tabs, activeTabIndex }, setActiveIndex] = useTabs()
   const networkAddresses = useNetworkAddresses()
   const balanceV1Simple = useTokenSubscription(networkAddresses.vMTA)?.balance?.simple
-  const [withdrawnBalance] = useStakingMigration()
+  const { hasWithdrawnV1Balance, hasSelectedStakeOption } = useStakingStatus()
 
   const { Graph, Form, heading, subheading } = stakeTabs[activeTabIndex]
 
-  return <StakeSelection />
-
-  return !!balanceV1Simple || withdrawnBalance ? (
+  return !!balanceV1Simple || hasWithdrawnV1Balance ? (
     <StakeMigration />
+  ) : !hasSelectedStakeOption ? (
+    <StakeSelection />
   ) : (
     <FormsContainer>
       <GraphContainer>
@@ -168,24 +124,16 @@ const Content: FC = () => {
       </GraphContainer>
       <FormContainer>
         <TabsOfTruth tabs={tabs} activeTabIndex={activeTabIndex} setActiveIndex={setActiveIndex} />
-        <StyledTransitionGroup>
-          <CSSTransition key={activeTabIndex} timeout={200}>
-            {className => (
-              <FormTransition className={className}>
-                <Form />
-              </FormTransition>
-            )}
-          </CSSTransition>
-        </StyledTransitionGroup>
+        <Form />
       </FormContainer>
     </FormsContainer>
   )
 }
 
 export const StakeForms: FC = () => (
-  <StakingMigrationProvider>
+  <StakingStatusProvider>
     <TabsProvider>
       <Content />
     </TabsProvider>
-  </StakingMigrationProvider>
+  </StakingStatusProvider>
 )

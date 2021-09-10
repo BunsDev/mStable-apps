@@ -9,7 +9,6 @@ import { colorTheme, ViewportWidth } from '../../theme'
 import { useBaseCtx } from '../../BaseProviders'
 
 const Container = styled.nav`
-
   > :first-child {
     display: block;
   }

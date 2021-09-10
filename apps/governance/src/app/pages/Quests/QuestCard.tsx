@@ -1,7 +1,8 @@
-import { useAccount } from '@apps/base/context/account'
-import React, { FC } from 'react'
+import React, { FC, ComponentProps } from 'react'
 import styled from 'styled-components'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 
+import { useAccount } from '@apps/base/context/account'
 import { useQuestQuery as useQuestbookQuestQuery } from '@apps/artifacts/graphql/questbook'
 import { QuestType, useQuestQuery as useStakingQuestQuery } from '@apps/artifacts/graphql/staking'
 import { useApolloClients } from '@apps/base/context/apollo'
@@ -87,6 +88,12 @@ const Container = styled(UnstyledButton)<{ type?: QuestType }>`
   }
 `
 
+const CardSkeleton: FC<ComponentProps<typeof Skeleton> & { className?: string }> = props => (
+  <SkeletonTheme color={'rgba(255,255,255,0.25)'} highlightColor={'rgba(255,255,255,0.15)'}>
+    <Skeleton {...props} />
+  </SkeletonTheme>
+)
+
 export const QuestCard: FC<Props> = ({ questId, onClick }) => {
   const account = useAccount()
 
@@ -114,14 +121,14 @@ export const QuestCard: FC<Props> = ({ questId, onClick }) => {
             <h2>{questbookQuery.data.quest.metadata?.title}</h2>
           </Typist>
         ) : (
-          <ThemedSkeleton height={30} />
+          <CardSkeleton height={30} />
         )}
       </Title>
       <QuestImage>
         {questbookQuery.data?.quest ? (
           <IPFSImg uri={questbookQuery.data.quest.metadata?.imageUrl} alt="Quest graphic" />
         ) : (
-          <ThemedSkeleton height={128} width={128} />
+          <CardSkeleton height={128} width={128} />
         )}
       </QuestImage>
       <QuestMultiplier>

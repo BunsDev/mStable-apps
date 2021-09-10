@@ -92,9 +92,10 @@ const Inner = styled.div`
   flex-direction: column;
   gap: 1rem;
   justify-content: space-between;
+  flex: 1;
 
   @media (min-width: ${ViewportWidth.m}) {
-    padding: 0.25rem 1.5rem;
+    padding: 0.25rem 1.5rem 0;
   }
 `
 
@@ -103,6 +104,7 @@ const Container = styled.div<{ type?: QuestType }>`
   justify-content: space-between;
   border-radius: 1rem;
   min-height: 20rem;
+  flex: 1;
 
   > *:first-child {
     display: none;
@@ -149,7 +151,6 @@ const mockObjectives: {
 
 export const QuestInfo: FC<{ questId: string }> = ({ questId }) => {
   const account = useAccount()
-
   const clients = useApolloClients()
   const questQuery = useStakingQuestQuery({
     client: clients.staking,
@@ -199,7 +200,6 @@ export const QuestInfo: FC<{ questId: string }> = ({ questId }) => {
             />
             <QuestProgress value={42} progressType={ProgressType.Group} questType={questType} />
             <QuestProgress value={13} progressType={ProgressType.TimeRemaining} questType={questType} />
-            {/* <QuestProgress value={0} progressType={ProgressType.Rarity} questType={questType} /> */}
           </Progress>
           <Season>
             <div>

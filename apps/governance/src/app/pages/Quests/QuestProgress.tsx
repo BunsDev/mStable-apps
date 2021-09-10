@@ -32,6 +32,7 @@ const ProgressBar = styled.div.attrs((props: { value?: number }) => ({ width: `$
 const Container = styled.div<{ progressType: ProgressType; questType?: QuestType }>`
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.75);
+  width: 100%;
 
   span {
     color: white;
@@ -47,7 +48,7 @@ const Container = styled.div<{ progressType: ProgressType; questType?: QuestType
   > :last-child {
     margin-top: 0.25rem;
     overflow: hidden;
-    background: ${({ theme }) => (theme.isLight ? '#564846' : '#29252f')};
+    background: ${({ theme }) => (theme.isLight ? '#443836' : '#29252f')};
     &:after {
       background: ${({ progressType }) =>
         progressType === ProgressType.Rarity ? '#42C1E9' : progressType === ProgressType.TimeRemaining ? '#E94C42' : '#6CC000'};
